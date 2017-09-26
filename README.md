@@ -1,4 +1,1 @@
-# devops-training
-
-For learning purpose.
-Currently learning git.
+# simple-java-maven-app
