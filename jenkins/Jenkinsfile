@@ -1,28 +1,40 @@
 pipeline {
     agent any
+
     options {
         skipStagesAfterUnstable()
     }
+
     stages {
+
         stage('Build') {
             steps {
                 sh 'mvn -B -DskipTests clean package'
             }
         }
+
         stage('Test') {
             steps {
                 sh 'mvn test'
             }
+
             post {
                 always {
                     junit 'target/surefire-reports/*.xml'
                 }
             }
         }
-        stage('Deliver') { 
+
+        stage('SAST - Semgrep') {
             steps {
-                sh './jenkins/scripts/deliver.sh' 
+                sh '''
+                    docker run --rm \
+                      -v "$WORKSPACE:/src" \
+                      semgrep/semgrep \
+                      semgrep --config=auto /src
+                '''
             }
         }
+
     }
 }
